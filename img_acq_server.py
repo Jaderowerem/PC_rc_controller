@@ -18,7 +18,12 @@ try:
     while True:
         # Read the length of the image as a 32-bit unsigned int. If the
         # length is zero, quit the loop
-        image_len = struct.unpack('<L', connection.read(struct.calcsize('<L')))[0]
+        try:
+            image_len = struct.unpack('<L', connection.read(struct.calcsize('<L')))[0]
+
+        except struct.error:
+            print("some packets are lost :(")
+
         if not image_len:
             break
         # Construct a stream to hold the image data and read the image
