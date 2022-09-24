@@ -30,6 +30,7 @@ try:
     for f in cam.capture_continuous(frame, 'jpeg', use_video_port=True):
         size = frame.tell()     # returns current position of the file pointer (size of file expressed in bytes)
         connection.write(struct.pack('<L', size))   # send size of frame
+        print("size of image frame:", struct.pack('<L', size))
         connection.flush()  # clears write buffer of the stream
         frame.seek(0)   # sets file pointer to the beginning
         connection.write(frame.read())  # send image frame
