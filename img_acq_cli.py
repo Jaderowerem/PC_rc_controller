@@ -25,22 +25,25 @@ try:
     print("auto white balance", cam.awb_mode)
 
     start = time.time()
-    frame = io.BytesIO()
+    frame = io.BytesIO()   # binary file
 
     for f in cam.capture_continuous(frame, 'jpeg', use_video_port=True):
-        connection.write(struct.pack('<L', frame.tell()))
-        connection.flush()
-        frame.seek(0)
-        connection.write(frame.read())
+        size = frame.tell()     # returns current position of the file pointer (size of file expressed in bytes)
+        connection.write(struct.pack('<L', size))   # send size of frame
+        connection.flush()  # clears write buffer of the stream
+        frame.seek(0)   # sets file pointer to the beginning
+        connection.write(frame.read())  # send image frame
 
         if time.time() - start > 10:
             break
 
+        # deallocate memory
         frame.seek(0)
         frame.truncate()
         print("frame sent")
 
     connection.write(struct.pack('<L', 0))
+    print("end of frame transmission:", struct.pack('<L', 0))
 
 finally:
     connection.close()
